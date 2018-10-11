@@ -4,7 +4,7 @@
 
 ## 简介 
 
-DiurnalParallax 是一个关于天体坐标的周日视差的计算组件，以转换站心与地心坐标
+DiurnalParallax 是一个关于天体坐标的周日视差的计算组件，可用以转换站心与地心坐标。
 
 以天体月球为例，其周日视差的示意图：
 
@@ -59,10 +59,10 @@ let gc = new SphericalCoordinate3D(r, theta, phi);
 
 // 实例化周日视差
 let dp = new DiurnalParallax({
-  gc: gc,
-  siderealTime: siderealTime,
-  obGeoLat: obGeoLat,
-  elevation: 1713,
+  gc,
+  siderealTime,
+  obGeoLat,
+  elevation,
 });
 
 // 获取站心球坐标

@@ -1,0 +1,29 @@
+{
+  "name": "@behaver/diurnal-parallax",
+  "version": "1.0.0",
+  "description": "The package is for calculating diurnal parallax.",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/behaver/diurnal-parallax.git"
+  },
+  "homepage": "https://github.com/behaver/celestial-coordinate#readme",
+  "keywords": [
+    "parallax"
+  ],
+  "author": "Sanwan, Dong",
+  "license": "MIT",
+  "devDependencies": {
+    "@behaver/jdate": "^2.1.0",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "@behaver/angle": "^2.0.2",
+    "@behaver/coordinate": "^3.2.3",
+    "@behaver/sidereal-time": "^1.0.1"
+  }
+}

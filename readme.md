@@ -81,11 +81,11 @@ let tc = dp.TC;
 
 规定参数：
 
-options.gc 地心球坐标，参数类型为 SphericalCoordinate3D 对象
-options.tc 站心球坐标，参数类型为 SphericalCoordinate3D 对象
-options.obGeoLat 观测位置地理纬度，单位：度，值域：[-90, 90]
-options.siderealTime 观测位置的当地真恒星时对象，参数类型为 SiderealTime 对象
-options.elevation 观测位置海拔高度，单位：米，值域：[-12000, 3e7]
+* options.gc 地心球坐标，参数类型为 SphericalCoordinate3D 对象
+* options.tc 站心球坐标，参数类型为 SphericalCoordinate3D 对象
+* options.obGeoLat 观测位置地理纬度，单位：度，值域：[-90, 90]
+* options.siderealTime 观测位置的当地真恒星时对象，参数类型为 SiderealTime 对象
+* options.elevation 观测位置海拔高度，单位：米，值域：[-12000, 3e7]
 
 `set TC(tc)`
 

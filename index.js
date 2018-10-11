@@ -43,8 +43,8 @@ class DiurnalParallax {
    * @param  {SphericalCoordinate3D} options.gc           地心球坐标
    * @param  {SphericalCoordinate3D} options.tc           站心球坐标
    * @param  {Number}                options.obGeoLat     观测位置地理纬度，单位：度，值域：[-90, 90]
+   * @param  {Number}                options.obElevation  观测位置海拔高度，单位：米，值域：[-12000, 3e7]
    * @param  {SiderealTime}          options.siderealTime 观测位置的当地真恒星时对象
-   * @param  {Number}                options.elevation    观测位置海拔高度，单位：米，值域：[-12000, 3e7]
    * 
    * @return {DiurnalParallax}                            返回 this 引用
    */
@@ -52,13 +52,13 @@ class DiurnalParallax {
     gc,
     tc,
     obGeoLat,
+    obElevation,
     siderealTime,
-    elevation,
   }) {
     // 参数预处理
-    if (elevation === undefined) elevation = 0;
-    else if (typeof(elevation) !== 'number') throw Error('The param elevation should be a Number.');
-    else if (elevation > 3e7 || elevation < -12000) throw Error('The param elevation should be in (-12000, 3e7).');
+    if (obElevation === undefined) obElevation = 0;
+    else if (typeof(obElevation) !== 'number') throw Error('The param obElevation should be a Number.');
+    else if (obElevation > 3e7 || obElevation < -12000) throw Error('The param obElevation should be in (-12000, 3e7).');
 
     if (siderealTime === undefined) throw Error('The param siderealTime should be defined.');
     else if (!(siderealTime instanceof SiderealTime)) throw Error('The param siderealTime should be a SiderealTime.');
@@ -68,7 +68,7 @@ class DiurnalParallax {
 
     this.private = {
       obGeoLat,
-      elevation,
+      obElevation,
       siderealTime,
     }
 
@@ -106,16 +106,16 @@ class DiurnalParallax {
     let TST = angle.setSeconds(this.private.siderealTime.trueVal).getRadian();
 
     // 海拔高度，单位：千米
-    let elevation = this.private.elevation / 1000;
+    let obElevation = this.private.obElevation / 1000;
 
     // 站心与地心向径的赤道平面投影长度，单位：千米
-    let r = EAR * Math.cos(geocentricLat) + elevation * Math.cos(geographicLat);
+    let r = EAR * Math.cos(geocentricLat) + obElevation * Math.cos(geographicLat);
 
     // 空间直角坐标系下周日视差的各轴修正值结果，单位：千米
     let corrections = {
       x: r * Math.cos(TST),
       y: r * Math.sin(TST),
-      z: EAR * Math.sin(geocentricLat) * PER + elevation * Math.sin(geographicLat),
+      z: EAR * Math.sin(geocentricLat) * PER + obElevation * Math.sin(geographicLat),
     }
 
     return corrections;

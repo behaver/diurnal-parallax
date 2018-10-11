@@ -32,13 +32,13 @@ describe('#CelestialCoordinate', () => {
       }).to.throw();
     });
 
-    it('The param elevation should be a Number.', () => {
+    it('The param obElevation should be a Number.', () => {
       expect(() => {
         let dp = new DiurnalParallax({
           gc: new SphericalCoordinate3D(0.37276, 2, 2),
           siderealTime: new SiderealTime(new JDateRepository(0, 'J2000'), 116),
           obGeoLat: 33,
-          elevation: 1111,
+          obElevation: 1111,
         });
       }).not.to.throw();
 
@@ -47,18 +47,18 @@ describe('#CelestialCoordinate', () => {
           gc: new SphericalCoordinate3D(0.37276, 2, 2),
           siderealTime: new SiderealTime(new JDateRepository(0, 'J2000'), 116),
           obGeoLat: 33,
-          elevation: '111',
+          obElevation: '111',
         });
       }).to.throw();
     });
 
-    it('The param elevation should be in (-12000, 3e7).', () => {
+    it('The param obElevation should be in (-12000, 3e7).', () => {
       expect(() => {
         let dp = new DiurnalParallax({
           gc: new SphericalCoordinate3D(0.37276, 2, 2),
           siderealTime: new SiderealTime(new JDateRepository(0, 'J2000'), 116),
           obGeoLat: 33,
-          elevation: -12001,
+          obElevation: -12001,
         });
       }).to.throw();
 
@@ -67,7 +67,7 @@ describe('#CelestialCoordinate', () => {
           gc: new SphericalCoordinate3D(0.37276, 2, 2),
           siderealTime: new SiderealTime(new JDateRepository(0, 'J2000'), 116),
           obGeoLat: 33,
-          elevation: 3e8,
+          obElevation: 3e8,
         });
       }).to.throw();
     });
@@ -205,7 +205,7 @@ describe('#CelestialCoordinate', () => {
       let jdate = new JDateRepository(date, 'date');
       let obGeoLong = angle.parseDACString('116°51′50″').getDegrees();
       let obGeoLat = angle.parseDACString('33°21′21″').getDegrees();
-      let elevation = 1713;
+      let obElevation = 1713;
 
       let siderealTime = new SiderealTime(jdate, obGeoLong);
 
@@ -220,7 +220,7 @@ describe('#CelestialCoordinate', () => {
         gc: gc,
         siderealTime: siderealTime,
         obGeoLat: obGeoLat,
-        elevation: 1713,
+        obElevation: 1713,
       });
 
       let tc = dp.TC;
@@ -237,7 +237,7 @@ describe('#CelestialCoordinate', () => {
       let jdate = new JDateRepository(date, 'date');
       let obGeoLong = angle.parseDACString('116°51′50″').getDegrees();
       let obGeoLat = angle.parseDACString('33°21′21″').getDegrees();
-      let elevation = 1713;
+      let obElevation = 1713;
 
       let siderealTime = new SiderealTime(jdate, obGeoLong);
 
@@ -250,7 +250,7 @@ describe('#CelestialCoordinate', () => {
         tc: tc,
         siderealTime: siderealTime,
         obGeoLat: obGeoLat,
-        elevation: 1713,
+        obElevation: 1713,
       });
 
       let gc = dp.GC;

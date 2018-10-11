@@ -40,7 +40,7 @@ let obGeoLong = angle.parseDACString('116°51′50″').getDegrees();
 let obGeoLat = angle.parseDACString('33°21′21″').getDegrees();
 
 // 观测位置海拔高度，单位：千米
-let elevation = 1713;
+let obElevation = 1713;
 
 // 观测位置恒星时对象
 let siderealTime = new SiderealTime(jdate, obGeoLong);
@@ -62,7 +62,7 @@ let dp = new DiurnalParallax({
   gc,
   siderealTime,
   obGeoLat,
-  elevation,
+  obElevation,
 });
 
 // 获取站心球坐标
@@ -84,8 +84,8 @@ let tc = dp.TC;
 * options.gc 地心球坐标，参数类型为 SphericalCoordinate3D 对象
 * options.tc 站心球坐标，参数类型为 SphericalCoordinate3D 对象
 * options.obGeoLat 观测位置地理纬度，单位：度，值域：[-90, 90]
+* options.obElevation 观测位置海拔高度，单位：米，值域：[-12000, 3e7]
 * options.siderealTime 观测位置的当地真恒星时对象，参数类型为 SiderealTime 对象
-* options.elevation 观测位置海拔高度，单位：米，值域：[-12000, 3e7]
 
 `set TC(tc)`
 

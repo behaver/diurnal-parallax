@@ -12,7 +12,7 @@ const angle = new Angle;
  * DiurnalParallax 是有关天体的周日视差的计算组件
  *
  * @author 董 三碗 <qianxing@yeah.net>
- * @version 1.0.0
+ * @version 1.1.0
  */
 class DiurnalParallax {
 
@@ -45,6 +45,7 @@ class DiurnalParallax {
    * @param  {Number}                options.obGeoLat     观测位置地理纬度，单位：度，值域：[-90, 90]
    * @param  {Number}                options.obElevation  观测位置海拔高度，单位：米，值域：[-12000, 3e7]
    * @param  {SiderealTime}          options.siderealTime 观测位置的当地真恒星时对象
+   * @param  {String}                options.system       坐标系统
    * 
    * @return {DiurnalParallax}                            返回 this 引用
    */
@@ -54,6 +55,7 @@ class DiurnalParallax {
     obGeoLat,
     obElevation,
     siderealTime,
+    system,
   }) {
     // 参数预处理
     if (obElevation === undefined) obElevation = 0;
@@ -66,10 +68,15 @@ class DiurnalParallax {
     if (typeof(obGeoLat) !== 'number') throw Error('The param obGeoLat should be defined and be a Number.');
     else if (obGeoLat < -90 || obGeoLat > 90) throw Error('The param obGeoLat should be in [-90, 90].');
 
+    if (system === undefined) system = 'equinoctial';
+    else if (typeof(system) !== 'string') throw Error('The param system should be a String.');
+    else if (system !== 'equinoctial' && system !== 'horizontal') throw Error('The param system should be equinoctial or horizontal.');
+
     this.private = {
       obGeoLat,
       obElevation,
       siderealTime,
+      system,
     }
 
     if (gc !== undefined) this.GC = gc;
@@ -89,6 +96,9 @@ class DiurnalParallax {
     // 地球赤道半径(千米)
     const EAR = 6378.1366; 
 
+    // 地球平均半径
+    const mER = 6371.393;
+
     // 地球极赤半径比
     const PER = 0.99664719
 
@@ -102,20 +112,33 @@ class DiurnalParallax {
     // 地心纬度，单位：弧度
     let geocentricLat = Math.atan(PER * Math.tan(geographicLat));
 
-    // 真恒星时，单位：弧度
-    let TST = angle.setSeconds(this.private.siderealTime.trueVal).getRadian();
-
     // 海拔高度，单位：千米
     let obElevation = this.private.obElevation / 1000;
 
-    // 站心与地心向径的赤道平面投影长度，单位：千米
-    let r = EAR * Math.cos(geocentricLat) + obElevation * Math.cos(geographicLat);
-
     // 空间直角坐标系下周日视差的各轴修正值结果，单位：千米
-    let corrections = {
-      x: r * Math.cos(TST),
-      y: r * Math.sin(TST),
-      z: EAR * Math.sin(geocentricLat) * PER + obElevation * Math.sin(geographicLat),
+    let corrections;
+
+    if (this.private.system === 'equinoctial') {
+      // 真恒星时，单位：弧度
+      let TST = angle.setSeconds(this.private.siderealTime.trueVal).getRadian();
+
+      // 站心与地心向径的赤道平面投影长度，单位：千米
+      let r = mER * Math.cos(geocentricLat) + obElevation * Math.cos(geographicLat);
+      
+      corrections = {
+        x: r * Math.cos(TST),
+        y: r * Math.sin(TST),
+        z: EAR * Math.sin(geocentricLat) * PER + obElevation * Math.sin(geographicLat),
+      }
+    } else if (this.private.system === 'horizontal') {
+      // 地理纬度与地心纬度间的差角，单位：弧度
+      let theta = geographicLat - geocentricLat;
+
+      corrections = {
+        x: EAR * Math.sin(theta),
+        y: 0,
+        z: EAR * Math.cos(theta) + obElevation,
+      }
     }
 
     return corrections;
@@ -153,7 +176,9 @@ class DiurnalParallax {
       this.position.tc.translate(-corrections['x'], -corrections['y'], -corrections['z']);
     }
 
-    return this.position.tc.equal();
+    let tc = this.position.tc.equal();
+
+    return new SphericalCoordinate3D(tc.r / this.consts.AU, tc.theta, tc.phi);
   }
 
   /**
@@ -188,7 +213,9 @@ class DiurnalParallax {
       this.position.gc.translate(corrections['x'], corrections['y'], corrections['z']);
     }
 
-    return this.position.gc.equal();
+    let gc = this.position.gc.equal();
+
+    return new SphericalCoordinate3D(gc.r / this.consts.AU, gc.theta, gc.phi);
   }
 }
 

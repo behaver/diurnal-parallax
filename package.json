@@ -17,13 +17,14 @@
   "author": "Sanwan, Dong",
   "license": "MIT",
   "devDependencies": {
+    "@behaver/celestial-coordinate": "^1.1.0",
     "@behaver/jdate": "^2.1.0",
     "chai": "^4.2.0",
     "mocha": "^5.2.0"
   },
   "dependencies": {
     "@behaver/angle": "^2.0.2",
-    "@behaver/coordinate": "^3.2.3",
+    "@behaver/coordinate": "^3.3.0",
     "@behaver/sidereal-time": "^1.0.1"
   }
 }

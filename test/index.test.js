@@ -3,6 +3,7 @@ const DiurnalParallax = require('../index');
 const { JDateRepository } = require('@behaver/jdate');
 const SiderealTime = require('@behaver/sidereal-time');
 const { SphericalCoordinate3D } = require('@behaver/coordinate/3d');
+const { EquinoctialCoordinate } = require('@behaver/celestial-coordinate');
 const Angle = require('@behaver/angle');
 
 const angle = new Angle;
@@ -158,14 +159,14 @@ describe('#CelestialCoordinate', () => {
   });
 
   describe('#get TC()', () => {
-    it('The return of method get TC() should have all keys r, theta and phi.', () => {
+    it('The return of method get TC() should be a instance of SphericalCoordinate3D.', () => {
       let dp = new DiurnalParallax({
         gc: new SphericalCoordinate3D(0.37276, 2, 2),
         siderealTime: new SiderealTime(new JDateRepository(0, 'J2000'), 116),
         obGeoLat: 33,
       });
 
-      expect(dp.TC).to.have.all.keys('r', 'theta', 'phi');
+      expect(dp.TC).to.be.a.instanceof(SphericalCoordinate3D);
     });
   });
 
@@ -188,19 +189,19 @@ describe('#CelestialCoordinate', () => {
   });
 
   describe('#get GC()', () => {
-    it('The return of method get GC() should have all keys r, theta and phi.', () => {
+    it('The return of method get GC() should be a instance of SphericalCoordinate3D.', () => {
       let dp = new DiurnalParallax({
         tc: new SphericalCoordinate3D(0.37276, 2, 2),
         siderealTime: new SiderealTime(new JDateRepository(0, 'J2000'), 116),
         obGeoLat: 33,
       });
 
-      expect(dp.GC).to.have.all.keys('r', 'theta', 'phi');
+      expect(dp.GC).to.be.a.instanceof(SphericalCoordinate3D);
     });
   });
 
   describe('#Verify', () => {
-    it('#天文算法 例39.a', () => {
+    it('#天文算法 例39.a，赤道坐标', () => {
       let date = new Date('2003/08/28 11:17:00');
       let jdate = new JDateRepository(date, 'date');
       let obGeoLong = angle.parseDACString('116°51′50″').getDegrees();
@@ -221,6 +222,7 @@ describe('#CelestialCoordinate', () => {
         siderealTime: siderealTime,
         obGeoLat: obGeoLat,
         obElevation: 1713,
+        system: 'equinoctial',
       });
 
       let tc = dp.TC;
@@ -232,7 +234,7 @@ describe('#CelestialCoordinate', () => {
       expect(90 - angle.setRadian(tc.theta).getDegrees()).to.closeTo(DECt, 0.00002);
     });
 
-    it('#天文算法 例39.a 反向计算，站心坐标 转 地心坐标', () => {
+    it('#天文算法 例39.a 反向计算，赤道坐标，站心坐标 转 地心坐标', () => {
       let date = new Date('2003/08/28 11:17:00');
       let jdate = new JDateRepository(date, 'date');
       let obGeoLong = angle.parseDACString('116°51′50″').getDegrees();
@@ -251,6 +253,7 @@ describe('#CelestialCoordinate', () => {
         siderealTime: siderealTime,
         obGeoLat: obGeoLat,
         obElevation: 1713,
+        system: 'equinoctial',
       });
 
       let gc = dp.GC;
@@ -260,6 +263,69 @@ describe('#CelestialCoordinate', () => {
 
       expect(angle.setRadian(gc.phi).getDegrees()).to.closeTo(RAt, 0.00002);
       expect(90 - angle.setRadian(gc.theta).getDegrees()).to.closeTo(DECt, 0.00002);
-    })
+    });
+
+    it('#天文算法 例39.a 地平坐标转换', () => {
+      let date = new Date('2003/08/28 11:17:00');
+      let jdate = new JDateRepository(date, 'date');
+      let obGeoLong = angle.parseDACString('116°51′50″').getDegrees();
+      let obGeoLat = angle.parseDACString('33°21′21″').getDegrees();
+      let obElevation = 1713;
+
+      let siderealTime = new SiderealTime(jdate, obGeoLong);
+
+      let r = 0.37276;
+      let theta = angle.setDegrees(90 + 15.771083).getRadian();
+      let phi = angle.setDegrees(339.530208).getRadian();
+      let egc = new SphericalCoordinate3D(r, theta, phi);
+
+      let dp = new DiurnalParallax({
+        gc: egc,
+        siderealTime: siderealTime,
+        obGeoLat: obGeoLat,
+        obElevation: 1713,
+        system: 'equinoctial',
+      });
+
+      // 赤道站心坐标
+      let etc = dp.TC;
+
+      let ec = new EquinoctialCoordinate({
+        sc: egc,
+        epoch: jdate,
+        withNutation: true,
+      });
+
+      // 地平地心坐标
+      let hgc = ec.toHorizontal({
+        obGeoLong,
+        obGeoLat,
+      }).sc;
+
+      let hdp = new DiurnalParallax({
+        gc: hgc,
+        siderealTime: siderealTime,
+        obGeoLat: obGeoLat,
+        obElevation: 1713,
+        system: 'horizontal',
+      });
+
+      let htc = hdp.TC;
+
+      let ec2 = new EquinoctialCoordinate({
+        sc: new SphericalCoordinate3D(etc.r, etc.theta, etc.phi),
+        epoch: jdate,
+        withNutation: true,
+      });
+
+      let htc2 = ec2.toHorizontal({
+        obGeoLong,
+        obGeoLat,
+      }).sc;
+
+      expect(htc.r).to.closeTo(htc2.r, 0.000001);
+      expect(htc.theta).to.closeTo(htc2.theta, 0.00001);
+      expect(htc.phi).to.closeTo(htc2.phi, 0.00001);
+    });
   })
 });

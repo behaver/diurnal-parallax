@@ -6,7 +6,7 @@
 
 DiurnalParallax 是一个关于天体坐标的周日视差的计算组件，可用以转换站心与地心坐标。
 
-以天体月球为例，其周日视差的示意图：
+以月球为例，其周日视差的示意图：
 
 ![周日月球视差](./doc/img/Lunaparallax.png)
 
@@ -54,7 +54,7 @@ let theta = angle.setDegrees(90 + 15.771083).getRadian();
 // 天体球坐标 phi 值
 let phi = angle.setDegrees(339.530208).getRadian();
 
-// 天体位置球坐标
+// 天体位置赤道球坐标
 let gc = new SphericalCoordinate3D(r, theta, phi);
 
 // 实例化周日视差
@@ -63,6 +63,7 @@ let dp = new DiurnalParallax({
   siderealTime,
   obGeoLat,
   obElevation,
+  system: 'equinoctial',
 });
 
 // 获取站心球坐标
@@ -86,6 +87,7 @@ let tc = dp.TC;
 * options.obGeoLat 观测位置地理纬度，单位：度，值域：[-90, 90]
 * options.obElevation 观测位置海拔高度，单位：米，值域：[-12000, 3e7]
 * options.siderealTime 观测位置的当地真恒星时对象，参数类型为 SiderealTime 对象
+* options.system 球坐标系统类型，可选用：equinoctial(赤道坐标) 和 horizontal(地平坐标)，默认为：equinoctial
 
 `set TC(tc)`
 

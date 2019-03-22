@@ -3,7 +3,7 @@ const DiurnalParallax = require('../index');
 const { JDateRepository } = require('@behaver/jdate');
 const SiderealTime = require('@behaver/sidereal-time');
 const { SphericalCoordinate3D } = require('@behaver/coordinate/3d');
-const { EquinoctialCoordinate } = require('@behaver/celestial-coordinate');
+const { EquinoctialCoordinate, SystemSwitcher } = require('@behaver/celestial-coordinate');
 const Angle = require('@behaver/angle');
 
 const angle = new Angle;
@@ -230,7 +230,7 @@ describe('#CelestialCoordinate', () => {
       let RAt = angle.parseHACString('22h 38m 08.54s').getDegrees();
       let DECt = angle.parseDACString('-15°46′30″').getDegrees();
 
-      expect(angle.setRadian(tc.phi).getDegrees()).to.closeTo(RAt, 0.00002);
+      expect(angle.setRadian(tc.phi).inRound().getDegrees()).to.closeTo(RAt, 0.00002);
       expect(90 - angle.setRadian(tc.theta).getDegrees()).to.closeTo(DECt, 0.00002);
     });
 
@@ -261,7 +261,7 @@ describe('#CelestialCoordinate', () => {
       let RAt = angle.setDegrees(339.530208).getDegrees();
       let DECt = angle.setDegrees(-15.771083).getDegrees();
 
-      expect(angle.setRadian(gc.phi).getDegrees()).to.closeTo(RAt, 0.00002);
+      expect(angle.setRadian(gc.phi).inRound().getDegrees()).to.closeTo(RAt, 0.00002);
       expect(90 - angle.setRadian(gc.theta).getDegrees()).to.closeTo(DECt, 0.00002);
     });
 
@@ -296,8 +296,10 @@ describe('#CelestialCoordinate', () => {
         withNutation: true,
       });
 
+      let SS = new SystemSwitcher();
+
       // 地平地心坐标
-      let hgc = ec.toHorizontal({
+      let hgc = SS.from(ec).to('hc', {
         obGeoLong,
         obGeoLat,
       }).sc;
@@ -318,7 +320,7 @@ describe('#CelestialCoordinate', () => {
         withNutation: true,
       });
 
-      let htc2 = ec2.toHorizontal({
+      let htc2 = SS.from(ec2).to('hc', {
         obGeoLong,
         obGeoLat,
       }).sc;

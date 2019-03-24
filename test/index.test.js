@@ -318,6 +318,7 @@ describe('#CelestialCoordinate', () => {
         sc: new SphericalCoordinate3D(etc.r, etc.theta, etc.phi),
         epoch: jdate,
         withNutation: true,
+        isContinuous: true,
       });
 
       let htc2 = SS.from(ec2).to('hc', {
